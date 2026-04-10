@@ -36,7 +36,19 @@ app.use(express.json());
 app.use(cookieParser());
 app.use('/uploads', express.static(path.resolve(__dirname, '../uploads')));
 
-connectDB();
+// Connect to DB on first request (lazy connection for Vercel)
+let dbConnected = false;
+app.use(async (req, res, next) => {
+  if (!dbConnected) {
+    try {
+      await connectDB();
+      dbConnected = true;
+    } catch (error) {
+      console.error('DB Connection failed:', error);
+    }
+  }
+  next();
+});
 
 app.use('/api/users', limiter, userRoutes);
 app.use('/api/hero', heroRoutes);  
@@ -49,7 +61,15 @@ app.use('/api/resume', auth, resumeRoutes);
 
 // Health check endpoint for Vercel
 app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'OK' });
+  res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error('Error:', err);
+  res.status(err.status || 500).json({
+    error: process.env.NODE_ENV === 'production' ? 'Internal Server Error' : err.message,
+  });
 });
 
 module.exports = app;
