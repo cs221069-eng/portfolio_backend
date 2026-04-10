@@ -1,4 +1,8 @@
-require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
+// Load environment variables
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
+}
+
 const path = require('path');
 const connectDB = require('./DB/db');
 const cors = require('cors');
@@ -43,6 +47,9 @@ app.use('/api/message', messageRoutes);
 app.use('/api/project', projectRoutes);
 app.use('/api/resume', auth, resumeRoutes);
 
-
+// Health check endpoint for Vercel
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'OK' });
+});
 
 module.exports = app;
