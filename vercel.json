@@ -11,12 +11,6 @@
       "src": "/(.*)",
       "dest": "server.js"
     }
-  ],
-  "env": {
-    "JWT_SECRET": "@jwt_secret",
-    "IMAGEKIT_PUBLIC_KEY": "@imagekit_public_key",
-    "IMAGEKIT_PRIVATE_KEY": "@imagekit_private_key",
-    "IMAGEKIT_URL_ENDPOINT": "@imagekit_url_endpoint",
-    "CORS_ORIGIN": "@cors_origin"
-  }
+  ]
+ 
 }
