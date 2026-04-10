@@ -1,28 +1,9 @@
-const fs = require('fs');
-const path = require('path');
 const multer = require('multer');
 
-const uploadDirectory = path.resolve(__dirname, '../../uploads/projects');
+// ✅ MEMORY STORAGE (Vercel compatible)
+const storage = multer.memoryStorage();
 
-if (!fs.existsSync(uploadDirectory)) {
-    fs.mkdirSync(uploadDirectory, { recursive: true });
-}
-
-const storage = multer.diskStorage({
-    destination: (_req, _file, cb) => {
-        cb(null, uploadDirectory);
-    },
-    filename: (_req, file, cb) => {
-        const extension = path.extname(file.originalname || '');
-        const safeBaseName = path
-            .basename(file.originalname || 'project-screenshot', extension)
-            .replace(/[^a-zA-Z0-9-_]/g, '-')
-            .toLowerCase();
-
-        cb(null, `${Date.now()}-${safeBaseName}${extension}`);
-    }
-});
-
+// ✅ FILE FILTER (same tera logic)
 const fileFilter = (_req, file, cb) => {
     if (file.mimetype && file.mimetype.startsWith('image/')) {
         cb(null, true);
@@ -32,6 +13,7 @@ const fileFilter = (_req, file, cb) => {
     cb(new Error('Only image uploads are allowed.'));
 };
 
+// ✅ MULTER CONFIG
 const upload = multer({
     storage,
     fileFilter,
