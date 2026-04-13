@@ -23,7 +23,7 @@ async function getAboutInfo(req, res) {
     try {   
         const about = await About.findOne();
         if (!about) {
-            return res.status(404).json({ message: 'About information not found' });
+            return res.status(204).send();
         }   
         res.json(about);
     } catch (error) {

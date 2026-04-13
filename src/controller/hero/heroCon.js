@@ -5,7 +5,7 @@ async function getHeroData(req, res) {
         const hero = await Hero.findOne({}, {}, { sort: { updatedAt: -1, createdAt: -1 } });
 
         if (!hero) {
-            return res.status(404).json({ message: 'Hero data not found' });
+            return res.status(204).send();
         }
 
         res.json({ hero });
