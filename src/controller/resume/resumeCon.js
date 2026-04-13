@@ -1,27 +1,5 @@
-const fs = require('fs');
-const path = require('path');
 const Resume = require('../../models/resumeModel/resume');
 const { uploadFile, deleteFile, getFileDetails } = require('../../utiles/imagekit');
-
-function getUploadedPath(file) {
-    if (!file?.path) {
-        return '';
-    }
-
-    return file.path;
-}
-
-function removeLocalUpload(filePath) {
-    if (!filePath) {
-        return;
-    }
-
-    const absolutePath = path.resolve(filePath);
-
-    if (fs.existsSync(absolutePath)) {
-        fs.unlinkSync(absolutePath);
-    }
-}
 
 async function uploadResume(req, res) {
     try {
@@ -46,11 +24,8 @@ async function uploadResume(req, res) {
             await deleteFile(existingResume.fileId);
         }
 
-        removeLocalUpload(getUploadedPath(req.file));
-
         res.status(201).json({ message: 'Resume uploaded successfully.', resume });
     } catch (error) {
-        removeLocalUpload(getUploadedPath(req.file));
         res.status(500).json({ message: 'Error uploading resume.', error: error.message });
     }
 }

@@ -1,6 +1,4 @@
 const Project = require('../../models/projectModel/project');
-const fs = require('fs');
-const path = require('path');
 const { uploadImage } = require('../../utiles/imagekit');
 
 function normalizeTags(tags) {
@@ -40,33 +38,12 @@ function normalizeUrl(url) {
     return `https://${trimmedUrl}`;
 }
 
-function getScreenshotPath(file) {
-    if (!file) {
-        return '';
-    }
-
-    return `/uploads/projects/${path.basename(file.path)}`;
-}
-
 function logUploadedFileBuffer(file) {
-    if (!file?.path) {
+    if (!file?.buffer) {
         return;
     }
 
-    const uploadedFileBuffer = fs.readFileSync(file.path);
-    console.log('Uploaded screenshot buffer:', uploadedFileBuffer);
-}
-
-function removeUploadedFile(filePath) {
-    if (!filePath || !filePath.startsWith('/uploads/projects/')) {
-        return;
-    }
-
-    const absolutePath = path.resolve(__dirname, '../../../', filePath.replace(/^\//, ''));
-
-    if (fs.existsSync(absolutePath)) {
-        fs.unlinkSync(absolutePath);
-    }
+    console.log('Uploaded screenshot size:', file.buffer.length);
 }
 
 async function addProject(req, res) {
@@ -80,7 +57,6 @@ async function addProject(req, res) {
         if (req.file) {
             const uploadedImage = await uploadImage(req.file);
             screenshotPath = uploadedImage.url;
-            removeUploadedFile(getScreenshotPath(req.file));
         }
 
         const project = new Project({
@@ -120,9 +96,6 @@ async function updateProject(req, res) {
         const existingProject = await Project.findById(req.params.id);
 
         if (!existingProject) {
-            if (req.file) {
-                removeUploadedFile(getScreenshotPath(req.file));
-            }
             return res.status(404).json({ message: 'Project not found' });
         }
 
@@ -131,7 +104,6 @@ async function updateProject(req, res) {
         if (req.file) {
             const uploadedImage = await uploadImage(req.file);
             screenshotPath = uploadedImage.url;
-            removeUploadedFile(getScreenshotPath(req.file));
         } else if (typeof screenshot === 'string') {
             screenshotPath = normalizeUrl(screenshot);
         }

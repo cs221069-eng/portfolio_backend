@@ -6,8 +6,14 @@ const client = new ImageKit({
 });
 
 async function uploadImage(file) {
+  const uploadSource = file?.buffer ?? (file?.path ? fs.createReadStream(file.path) : null);
+
+  if (!uploadSource) {
+    throw new Error('No upload data found for image file.');
+  }
+
   const response = await client.files.upload({
-    file: fs.createReadStream(file.path),
+    file: uploadSource,
     fileName: file.originalname || `project-${Date.now()}.jpg`,
   });
 
@@ -25,8 +31,14 @@ async function uploadImage(file) {
 }
 
 async function uploadFile(file) {
+  const uploadSource = file?.buffer ?? (file?.path ? fs.createReadStream(file.path) : null);
+
+  if (!uploadSource) {
+    throw new Error('No upload data found for file upload.');
+  }
+
   const response = await client.files.upload({
-    file: fs.createReadStream(file.path),
+    file: uploadSource,
     fileName: file.originalname || `file-${Date.now()}`,
   });
 

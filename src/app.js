@@ -3,7 +3,6 @@ if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
 }
 
-const path = require('path');
 const connectDB = require('./DB/db');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
@@ -34,7 +33,6 @@ app.use(cors({
 
 app.use(express.json());
 app.use(cookieParser());
-app.use('/uploads', express.static(path.resolve(__dirname, '../uploads')));
 
 // Connect to DB on first request (lazy connection for Vercel)
 let dbConnected = false;
