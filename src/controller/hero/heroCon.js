@@ -36,16 +36,18 @@ async function updateHeroData(req, res) {
     try {
         const { description, status } = req.body;
 
-        const latestHero = await Hero.findOne({}, {}, { sort: { updatedAt: -1, createdAt: -1 } });
-
-        if (!latestHero) {
-            return res.status(404).json({ message: 'Hero not found' });
-        }
-
-        latestHero.description = description;
-        latestHero.status = status;
-
-        await latestHero.save();
+        const latestHero = await Hero.findOneAndUpdate(
+            {},
+            {
+                description,
+                status,
+            },
+            {
+                new: true,
+                upsert: true,
+                sort: { updatedAt: -1, createdAt: -1 },
+            }
+        );
 
         res.json({ message: 'Hero data updated successfully', hero: latestHero });
     } catch (error) {
