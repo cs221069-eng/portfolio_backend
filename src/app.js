@@ -26,9 +26,25 @@ const limiter = rateLimit({
 const express = require('express');
 const app = express();
 
+const allowedOrigins = [
+  'http://localhost:5173',      // Local frontend development
+  'http://localhost:3000',      // Local admin frontend development
+  'http://localhost:5174',      // Alternative local port
+  process.env.FRONTEND_URL,     // Main portfolio - Vercel URL
+  process.env.ADMIN_FRONTEND_URL, // Admin dashboard - Vercel URL
+].filter(Boolean); // null/undefined values remove karke
+
 app.use(cors({
-  origin: true,
+  origin: (origin, callback) => {
+    if (allowedOrigins.includes(origin) || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
 app.use(express.json());
