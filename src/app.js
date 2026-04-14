@@ -27,14 +27,15 @@ const express = require('express');
 const app = express();
 
 app.use((req, res, next) => {
-  const allowedOrigins = [
-  process.env.ADMIN_FRONTEND_URL,
-  process.env.PUBLIC_FRONTEND_URL,
-  ];
+  const allowedOrigins = (process.env.ALLOWED_ORIGINS || '')
+    .split(',')
+    .map(o => o.trim())
+    .filter(Boolean);
 
   const origin = req.headers.origin;
 
-  if (allowedOrigins.includes(origin)) {
+  // 🔥 safe check
+  if (origin && allowedOrigins.includes(origin)) {
     res.setHeader('Access-Control-Allow-Origin', origin);
   }
 
