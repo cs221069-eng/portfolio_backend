@@ -14,17 +14,16 @@ async function uploadFile(file) {
   const uploadSource = file?.buffer;
 
   if (!uploadSource) {
-    throw new Error('No file buffer found for upload.');
+    throw new Error('No file buffer found.');
   }
 
-  const response = await client.upload({
+  const response = await client.files.upload({
     file: uploadSource,
     fileName: file.originalname || `file-${Date.now()}`
   });
 
   return {
     url: response.url,
-    fileId: response.fileId,
     response
   };
 }
