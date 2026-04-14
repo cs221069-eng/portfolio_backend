@@ -1,24 +1,31 @@
 const multer = require('multer');
 
-// ✅ MEMORY STORAGE (Vercel compatible)
+// MEMORY STORAGE (Vercel safe)
 const storage = multer.memoryStorage();
 
-// ✅ FILE FILTER (same tera logic)
+// FILE FILTER (FIXED)
 const fileFilter = (_req, file, cb) => {
-    if (file.mimetype && file.mimetype.startsWith('image/')) {
+    const allowedTypes = [
+        'image/jpeg',
+        'image/png',
+        'image/jpg',
+        'application/pdf'
+    ];
+
+    if (allowedTypes.includes(file.mimetype)) {
         cb(null, true);
         return;
     }
 
-    cb(new Error('Only image uploads are allowed.'));
+    cb(new Error('Only image and PDF uploads are allowed.'));
 };
 
-// ✅ MULTER CONFIG
+// MULTER CONFIG
 const upload = multer({
     storage,
     fileFilter,
     limits: {
-        fileSize: 5 * 1024 * 1024
+        fileSize: 10 * 1024 * 1024 // 10MB
     }
 });
 
