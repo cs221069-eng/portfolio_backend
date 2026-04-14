@@ -1,79 +1,77 @@
-const fs = require('fs');
 const ImageKit = require('@imagekit/nodejs');
 
 const client = new ImageKit({
-  privateKey: process.env['IMAGEKIT_PRIVATE_KEY'],
+  publicKey: process.env.IMAGEKIT_PUBLIC_KEY,
+  privateKey: process.env.IMAGEKIT_PRIVATE_KEY,
+  urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT
 });
 
-async function uploadImage(file) {
-  const uploadSource = file?.buffer ?? (file?.path ? fs.createReadStream(file.path) : null);
-
-  if (!uploadSource) {
-    throw new Error('No upload data found for image file.');
-  }
-
-  const response = await client.files.upload({
-    file: uploadSource,
-    fileName: file.originalname || `project-${Date.now()}.jpg`,
-  });
-
-  const url = process.env['IMAGEKIT_URL_ENDPOINT']
-    ? client.helper.buildSrc({
-        urlEndpoint: process.env['IMAGEKIT_URL_ENDPOINT'],
-        src: response.filePath,
-      })
-    : response.url;
-
-  return {
-    url,
-    response,
-  };
-}
-
+/**
+ * Upload any file (image, pdf, etc.)
+ * Vercel safe (ONLY buffer)
+ */
 async function uploadFile(file) {
-  const uploadSource = file?.buffer ?? (file?.path ? fs.createReadStream(file.path) : null);
+  const uploadSource = file?.buffer;
 
   if (!uploadSource) {
-    throw new Error('No upload data found for file upload.');
+    throw new Error('No file buffer found for upload.');
   }
 
-  const response = await client.files.upload({
+  const response = await client.upload({
     file: uploadSource,
-    fileName: file.originalname || `file-${Date.now()}`,
+    fileName: file.originalname || `file-${Date.now()}`
   });
 
-  const url = process.env['IMAGEKIT_URL_ENDPOINT']
-    ? client.helper.buildSrc({
-        urlEndpoint: process.env['IMAGEKIT_URL_ENDPOINT'],
-        src: response.filePath,
-      })
-    : response.url;
-
   return {
-    url,
-    response,
+    url: response.url,
+    fileId: response.fileId,
+    response
   };
 }
 
-async function deleteFile(fileId) {
-  if (!fileId) {
-    return;
+/**
+ * Upload Image (same logic, separated for clarity)
+ */
+async function uploadImage(file) {
+  const uploadSource = file?.buffer;
+
+  if (!uploadSource) {
+    throw new Error('No file buffer found for image upload.');
   }
 
-  await client.files.delete(fileId);
+  const response = await client.upload({
+    file: uploadSource,
+    fileName: file.originalname || `image-${Date.now()}.jpg`
+  });
+
+  return {
+    url: response.url,
+    fileId: response.fileId,
+    response
+  };
 }
 
-async function getFileDetails(fileId) {
-  if (!fileId) {
-    return null;
-  }
+/**
+ * Delete file from ImageKit
+ */
+async function deleteFile(fileId) {
+  if (!fileId) return;
 
-  return client.files.get(fileId);
+  return await client.deleteFile(fileId);
+}
+
+/**
+ * Get file details
+ */
+async function getFileDetails(fileId) {
+  if (!fileId) return null;
+
+  return await client.getFileDetails(fileId);
 }
 
 module.exports = {
-  uploadImage,
   uploadFile,
+  uploadImage,
   deleteFile,
-  getFileDetails,
+  getFileDetails
 };
