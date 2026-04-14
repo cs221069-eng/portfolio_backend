@@ -11,19 +11,22 @@ const client = new ImageKit({
  * Vercel safe (ONLY buffer)
  */
 async function uploadFile(file) {
-  const uploadSource = file?.buffer;
-
-  if (!uploadSource) {
-    throw new Error('No file buffer found.');
+  if (!file?.buffer) {
+    throw new Error("No file buffer found");
   }
 
+  // 🔥 IMPORTANT: convert buffer to base64
+  const base64File = file.buffer.toString('base64');
+
   const response = await client.files.upload({
-    file: uploadSource,
-    fileName: file.originalname || `file-${Date.now()}`
+    file: base64File, // ✅ THIS FIXES ERROR
+    fileName: file.originalname || `file-${Date.now()}`,
+    folder: "/resumes"
   });
 
   return {
     url: response.url,
+    fileId: response.fileId,
     response
   };
 }
