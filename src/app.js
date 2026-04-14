@@ -28,8 +28,8 @@ const app = express();
 
 app.use((req, res, next) => {
   const allowedOrigins = [
-    'http://localhost:5173',
-    'https://portfolio-front-rosy-three.vercel.app'
+  process.env.ADMIN_FRONTEND_URL,
+  process.env.PUBLIC_FRONTEND_URL,
   ];
 
   const origin = req.headers.origin;
