@@ -75,7 +75,7 @@ app.use('/api/about', aboutRoutes);
 app.use('/api/education', educationRoutes);
 app.use('/api/message', messageRoutes);
 app.use('/api/project', projectRoutes);
-app.use('/api/resume', auth, resumeRoutes);
+app.use('/api/resume', resumeRoutes);
 
 // Health check endpoint for Vercel
 app.get('/health', (req, res) => {
