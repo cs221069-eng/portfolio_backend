@@ -59,7 +59,7 @@ async function uploadImage(file) {
 async function deleteFile(fileId) {
   if (!fileId) return;
 
-  return await client.deleteFile(fileId);
+  return await client.files.delete(fileId);
 }
 
 /**
