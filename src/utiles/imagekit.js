@@ -68,7 +68,7 @@ async function deleteFile(fileId) {
 async function getFileDetails(fileId) {
   if (!fileId) return null;
 
-  return await client.getFileDetails(fileId);
+  return await client.files.get(fileId);
 }
 
 module.exports = {
