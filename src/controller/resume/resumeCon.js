@@ -6,7 +6,8 @@ async function uploadResume(req, res) {
         if (!req.file) {
             return res.status(400).json({ message: 'Resume file is required.' });
         }
-
+   console.log("🔥 ROUTE HIT: /api/resume/upload");
+    console.log("📦 FILE RECEIVED:", req.file);
         const existingResume = await Resume.findOne().sort({ createdAt: -1 });
         const uploadedResume = await uploadFile(req.file);
 
