@@ -74,6 +74,7 @@ async function addProject(req, res) {
         await project.save();
         res.status(201).json({ message: 'Project added successfully', project });
     } catch (error) {
+        console.error('Error adding project:', error);
         res.status(500).json({ message: 'Error adding project', error: error.message });
     }
 }
@@ -126,6 +127,7 @@ async function updateProject(req, res) {
 
         res.status(200).json({ message: 'Project updated successfully', project: updatedProject });
     } catch (error) {
+        console.error('Error updating project:', error);
         res.status(500).json({ message: 'Error updating project', error: error.message });
     }
 }
