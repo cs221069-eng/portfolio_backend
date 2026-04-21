@@ -6,11 +6,25 @@ const client = new ImageKit({
   urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT
 });
 
+function ensureImageKitConfig() {
+  const missingVars = [
+    'IMAGEKIT_PUBLIC_KEY',
+    'IMAGEKIT_PRIVATE_KEY',
+    'IMAGEKIT_URL_ENDPOINT'
+  ].filter((key) => !process.env[key]);
+
+  if (missingVars.length) {
+    throw new Error(`Missing ImageKit environment variables: ${missingVars.join(', ')}`);
+  }
+}
+
 /**
  * Upload any file (image, pdf, etc.)
  * Vercel safe (ONLY buffer)
  */
 async function uploadFile(file) {
+  ensureImageKitConfig();
+
   if (!file?.buffer) {
     throw new Error("No file buffer found");
   }
@@ -35,15 +49,19 @@ async function uploadFile(file) {
  * Upload Image (same logic, separated for clarity)
  */
 async function uploadImage(file) {
-  const uploadSource = file?.buffer;
+  ensureImageKitConfig();
 
-  if (!uploadSource) {
+  if (!file?.buffer) {
     throw new Error('No file buffer found for image upload.');
   }
 
-  const response = await client.upload({
-    file: uploadSource,
-    fileName: file.originalname || `image-${Date.now()}.jpg`
+  const base64File = file.buffer.toString('base64');
+
+  const response = await client.files.upload({
+    file: base64File,
+    fileName: file.originalname || `image-${Date.now()}.jpg`,
+    folder: '/projects',
+    useUniqueFileName: true
   });
 
   return {
